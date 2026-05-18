@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Toxic-MD QR Pairing - Scan to Connect</title>
+  <link rel="icon" type="image/x-icon" href="https://files.catbox.moe/el0qlh.jpeg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #ff4444;
+      --primary-dark: #cc0000;
+      --accent: #00ff00;
+      --background: #0a0a0a;
+      --surface: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --gradient-primary: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: var(--background);
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 68, 68, 0.1) 0%, transparent 50%),
+        repeating-linear-gradient(45deg, rgba(255, 68, 68, 0.02) 0px, rgba(255, 68, 68, 0.02) 2px, transparent 2px, transparent 8px);
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(26, 26, 26, 0.95);
+      border-radius: 20px;
+      border: 2px solid rgba(255, 68, 68, 0.3);
+      padding: 40px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.8s ease-out;
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .header i {
+      font-size: 60px;
+      color: var(--primary);
+      margin-bottom: 15px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { text-shadow: 0 0 10px rgba(255, 68, 68, 0.5); }
+      50% { text-shadow: 0 0 30px rgba(255, 68, 68, 0.8); }
+    }
+
+    h1 {
+      font-size: 24px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .qr-container {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      margin: 25px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 300px;
+      background: #ffffff;
+    }
+
+    .qr-placeholder {
+      text-align: center;
+      color: #666;
+    }
+
+    .qr-placeholder i {
+      font-size: 80px;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
+
+    .qr-placeholder p {
+      font-size: 14px;
+    }
+
+    #qr-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 68, 68, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .info-box {
+      background: rgba(255, 68, 68, 0.05);
+      border-left: 3px solid var(--primary);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 25px;
+      text-align: left;
+    }
+
+    .info-box p {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 5px 0;
+    }
+
+    .info-box i {
+      color: var(--primary);
+      margin-right: 8px;
+    }
+
+    .steps {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .steps h3 {
+      font-size: 14px;
+      color: var(--primary);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .steps ol {
+      padding-left: 20px;
+    }
+
+    .steps li {
+      color: var(--text-secondary);
+      font-size: 12px;
+      margin: 10px 0;
+      line-height: 1.4;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(30, 30, 30, 0.9);
+      color: var(--text-primary);
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: bold;
+      margin-top: 20px;
+      border: 1px solid rgba(255, 68, 68, 0.4);
+      transition: all 0.3s ease;
+      font-family: monospace;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 68, 68, 0.1);
+      border-color: var(--primary);
+    }
+
+    .error-message {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      color: #ff8888;
+    }
+
+    .refresh-btn {
+      background: var(--gradient-primary);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      margin-top: 15px;
+      font-family: monospace;
+      font-weight: bold;
+    }
+
+    @media (max-width: 550px) {
+      .container {
+        padding: 25px;
+      }
+      
+      h1 {
+        font-size: 20px;
+      }
+      
+      .header i {
+        font-size: 45px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <i class="fas fa-qrcode"></i>
+      <h1>FEE XMD</h1>
+      <p class="subtitle">QR CODE PAIRING</p>
+    </div>
+
+    <div class="qr-container" id="qr-container">
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Generating QR code...</p>
+      </div>
+      <div id="qr-display" style="display: none;">
+        <img id="qr-image" alt="WhatsApp QR Code">
+      </div>
+    </div>
+
+    <div class="info-box">
+      <p><i class="fas fa-info-circle"></i> Scan this QR code with WhatsApp to connect your device</p>
+      <p><i class="fas fa-clock"></i> QR code refreshes every 20 seconds for security</p>
+    </div>
+
+    <div class="steps">
+      <h3><i class="fab fa-whatsapp"></i> HOW TO CONNECT:</h3>
+      <ol>
+        <li>Open WhatsApp on your phone</li>
+        <li>Go to <strong>Settings → Linked Devices</strong></li>
+        <li>Tap <strong>Link a Device</strong></li>
+        <li>Scan the QR code above with your phone</li>
+        <li>Your session ID will be sent to your WhatsApp</li>
+      </ol>
+    </div>
+
+    <a href="/" class="back-btn">
+      <i class="fas fa-arrow-left"></i> BACK TO PAIRING
+    </a>
+  </div>
+
+  <script>
+    const qrContainer = document.getElementById('qr-container');
+    const loading = document.getElementById('loading');
+    const qrDisplay = document.getElementById('qr-display');
+    const qrImage = document.getElementById('qr-image');
+    
+    let currentAbortController = null;
+    let refreshInterval = null;
+
+    async function fetchQRCode() {
+      if (currentAbortController) {
+        currentAbortController.abort();
+      }
+      
+      currentAbortController = new AbortController();
+      
+      try {
+        loading.style.display = 'flex';
+        qrDisplay.style.display = 'none';
+        
+        const response = await fetch('/qr', {
+          signal: currentAbortController.signal
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        
+        qrImage.onload = () => {
+          URL.revokeObjectURL(url);
+          loading.style.display = 'none';
+          qrDisplay.style.display = 'block';
+        };
+        
+        qrImage.src = url;
+        
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          return;
+        }
+        
+        console.error('QR fetch error:', error);
+        loading.style.display = 'none';
+        qrDisplay.style.display = 'block';
+        qrDisplay.innerHTML = `
+          <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Failed to generate QR code</p>
+            <button class="refresh-btn" onclick="location.reload()">
+              <i class="fas fa-sync-alt"></i> TRY AGAIN
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    // Start QR fetching
+    fetchQRCode();
+    
+    // Refresh QR every 25 seconds
+    refreshInterval = setInterval(() => {
+      fetchQRCode();
+    }, 25000);
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+      if (currentAbortController) {
+        currentAbortController.abort();
+      }
+    });
+  </script>
+</body>
+</html>
