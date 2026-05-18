@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>FEE-ZMD Pairing System - Generate WhatsApp Pairing Code</title>
+  <link rel="icon" type="image/x-icon" href="https://files.catbox.moe/el0qlh.jpeg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #ff4444;
+      --primary-dark: #cc0000;
+      --secondary: #ff6666;
+      --accent: #00ff00;
+      --danger: #ff4444;
+      --background: #0a0a0a;
+      --surface: #1a1a1a;
+      --surface-light: #2a2a2a;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --gradient-primary: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+      --gradient-secondary: linear-gradient(135deg, #cc0000 0%, #ff4444 100%);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+      --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: var(--background);
+      font-family: 'Courier New', 'Segoe UI', monospace;
+      color: var(--text-primary);
+      overflow: auto;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 68, 68, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 68, 68, 0.05) 0%, transparent 50%),
+        repeating-linear-gradient(45deg, rgba(255, 68, 68, 0.02) 0px, rgba(255, 68, 68, 0.02) 2px, transparent 2px, transparent 8px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 550px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out forwards;
+      position: relative;
+      z-index: 2;
+      max-height: 95vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .container::-webkit-scrollbar-track {
+      background: rgba(30, 30, 30, 0.5);
+      border-radius: 10px;
+    }
+
+    .container::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Main Card */
+    .dashboard-card {
+      position: relative;
+      background: rgba(26, 26, 26, 0.95);
+      padding: 40px 35px;
+      border-radius: 20px;
+      text-align: center;
+      border: 2px solid rgba(255, 68, 68, 0.3);
+      box-shadow: 
+        var(--shadow-xl),
+        0 0 40px rgba(255, 68, 68, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.4s ease;
+      width: 100%;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 68, 68, 0.6);
+      box-shadow: 0 0 60px rgba(255, 68, 68, 0.3);
+    }
+
+    /* Card Header */
+    .card-header {
+      margin-bottom: 30px;
+    }
+
+    .bot-avatar {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+
+    .avatar-container {
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 68, 68, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(255, 68, 68, 0.8); }
+    }
+
+    .avatar-container i {
+      font-size: 50px;
+      color: white;
+    }
+
+    .card-title {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .card-subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 350px;
+      margin: 0 auto;
+    }
+
+    /* Input Section */
+    .input-group {
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    .input-label {
+      display: block;
+      text-align: left;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      font-family: monospace;
+    }
+
+    .input-label i {
+      color: var(--primary);
+      margin-right: 8px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 12px;
+      background: rgba(10, 10, 10, 0.8);
+      padding: 5px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(255, 68, 68, 0.2);
+    }
+
+    .phone-input {
+      flex: 1;
+      padding: 15px 18px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(20, 20, 20, 0.9);
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+    }
+
+    .phone-input:focus {
+      outline: none;
+      background: rgba(30, 30, 30, 0.9);
+    }
+
+    .phone-input::placeholder {
+      color: var(--text-muted);
+      font-weight: normal;
+    }
+
+    .generate-btn {
+      padding: 15px 28px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .generate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255, 68, 68, 0.4);
+    }
+
+    /* Loader */
+    .loader-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 30px;
+    }
+
+    .modern-loader {
+      width: 50px;
+      height: 50px;
+      position: relative;
+    }
+
+    .loader-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 3px solid transparent;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loader-ring:nth-child(2) {
+      border-top-color: var(--accent);
+      animation-delay: 0.3s;
+      width: 70%;
+      height: 70%;
+      top: 15%;
+      left: 15%;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* Result Display */
+    .result-container {
+      width: 100%;
+      min-height: 100px;
+    }
+
+    .code-display {
+      background: rgba(10, 10, 10, 0.8);
+      border-radius: 16px;
+      padding: 25px;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .code-label {
+      color: var(--text-secondary);
+      font-size: 12px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .code-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--accent);
+      letter-spacing: 5px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      margin-bottom: 20px;
+      border: 1px dashed rgba(0, 255, 0, 0.3);
+    }
+
+    .code-highlight {
+      color: var(--accent);
+      text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    }
+
+    .copy-btn {
+      width: 100%;
+      padding: 14px;
+      background: rgba(30, 30, 30, 0.9);
+      color: var(--text-primary);
+      border: 1px solid rgba(255, 68, 68, 0.4);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: monospace;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 68, 68, 0.1);
+      border-color: var(--primary);
+    }
+
+    .copy-btn.copied {
+      background: rgba(0, 255, 0, 0.1);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Info Box */
+    .info-message {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 68, 68, 0.05);
+      border-radius: 12px;
+      border-left: 3px solid var(--primary);
+      text-align: left;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .info-message i {
+      color: var(--primary);
+      margin-right: 8px;
+    }
+
+    /* Additional Sections */
+    .additional-sections {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .usage-section, .deploy-section, .qr-section {
+      background: rgba(26, 26, 26, 0.95);
+      padding: 25px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .usage-section:hover, .deploy-section:hover, .qr-section:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 68, 68, 0.5);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--primary);
+      font-family: monospace;
+      text-transform: uppercase;
+    }
+
+    .section-title i {
+      font-size: 20px;
+    }
+
+    .instructions-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .instructions-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .instructions-list li i {
+      color: var(--accent);
+      margin-top: 2px;
+      font-size: 12px;
+    }
+
+    .instructions-list code {
+      background: rgba(0, 255, 0, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    .deploy-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .heroku-btn, .github-btn, .qr-link-btn {
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      font-family: monospace;
+    }
+
+    .heroku-btn {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .heroku-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255, 68, 68, 0.4);
+    }
+
+    .github-btn, .qr-link-btn {
+      background: rgba(30, 30, 30, 0.9);
+      color: var(--text-primary);
+      border: 1px solid rgba(255, 68, 68, 0.4);
+    }
+
+    .github-btn:hover, .qr-link-btn:hover {
+      background: rgba(255, 68, 68, 0.1);
+      border-color: var(--primary);
+    }
+
+    .qr-link-btn i {
+      color: var(--accent);
+    }
+
+    .deploy-info {
+      margin-top: 15px;
+      padding: 12px;
+      background: rgba(0, 255, 0, 0.05);
+      border-radius: 10px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      border-left: 3px solid var(--accent);
+    }
+
+    @media (max-width: 550px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .dashboard-card, .usage-section, .deploy-section, .qr-section {
+        padding: 25px 20px;
+      }
+      
+      .card-title {
+        font-size: 24px;
+      }
+      
+      .input-wrapper {
+        flex-direction: column;
+      }
+      
+      .generate-btn {
+        justify-content: center;
+      }
+      
+      .code-value {
+        font-size: 24px;
+        letter-spacing: 3px;
+        word-break: break-all;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <div class="bot-avatar">
+          <div class="avatar-container">
+            <i class="fas fa-skull"></i>
+          </div>
+        </div>
+        <h1 class="card-title"> FEE XMD </h1>
+        <p class="card-subtitle"> PAIRING SYSTEM</p>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">
+          <i class="fas fa-mobile-alt"></i> ENTER WHATSAPP NUMBER
+        </label>
+        <div class="input-wrapper">
+          <input 
+            type="tel" 
+            id="number" 
+            class="phone-input"
+            placeholder="254712345678"
+            pattern="[0-9]*"
+            inputmode="numeric"
+          >
+          <button id="submit" class="generate-btn">
+            <i class="fas fa-bolt"></i> GENERATE
+          </button>
+        </div>
+      </div>
+
+      <div class="loader-container" id="waiting-message">
+        <div class="modern-loader">
+          <div class="loader-ring"></div>
+          <div class="loader-ring"></div>
+        </div>
+        <div class="loader-text">Generating pairing code...</div>
+      </div>
+
+      <div class="result-container" id="pair"></div>
+
+      <div class="info-message">
+        <i class="fas fa-shield-alt"></i>
+        Copy the code and paste it in your WhatsApp linked devices section.<br>
+        The code expires quickly so move your slow ass.
+      </div>
+    </div>
+
+    <div class="additional-sections">
+      <div class="qr-section">
+        <h2 class="section-title">
+          <i class="fas fa-qrcode"></i> QR CODE PAIRING
+        </h2>
+        <a href="/qr" class="qr-link-btn" style="display: flex; justify-content: center;">
+          <i class="fas fa-camera"></i> SCAN QR CODE TO PAIR
+        </a>
+        <div class="deploy-info" style="margin-top: 15px;">
+          <i class="fas fa-info-circle"></i> Click above to generate QR code for WhatsApp Web pairing
+        </div>
+      </div>
+
+      <div class="usage-section">
+        <h2 class="section-title">
+          <i class="fab fa-whatsapp"></i> HOW TO USE
+        </h2>
+        <ul class="instructions-list">
+          <li><i class="fas fa-1"></i> Enter your WhatsApp number with country code</li>
+          <li><i class="fas fa-2"></i> Click GENERATE to get pairing code</li>
+          <li><i class="fas fa-3"></i> Open WhatsApp → Settings → Linked Devices</li>
+          <li><i class="fas fa-4"></i> Tap "Link a Device" and enter the code</li>
+          <li><i class="fas fa-5"></i> Your session ID will be sent to your WhatsApp</li>
+        </ul>
+      </div>
+
+      <div class="deploy-section">
+        <h2 class="section-title">
+          <i class="fas fa-cloud-upload-alt"></i> DEPLOY YOUR OWN
+        </h2>
+        <div class="deploy-buttons">
+          <a href="https://dashboard.heroku.com/new?template=https://github.com/Fred1e/Fee-Xmd" 
+             target="_blank" 
+             class="heroku-btn">
+            <i class="fab fa-heroku"></i> DEPLOY ON HEROKU
+          </a>
+          <a href="https://github.com/Fred1e/Fee-Xmd" 
+             target="_blank" 
+             class="github-btn">
+            <i class="fab fa-github"></i> VIEW GITHUB REPO
+          </a>
+        </div>
+        <div class="deploy-info">
+          <i class="fas fa-code-branch"></i> Fork and deploy your own Fee-Xmd bot instance
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+  <script>
+    const resultContainer = document.getElementById("pair");
+    const submitBtn = document.getElementById("submit");
+    const phoneInput = document.getElementById("number");
+    const waitingMessage = document.getElementById("waiting-message");
+
+    async function copyCode(button) {
+      const codeElement = document.querySelector('.code-highlight');
+      if (!codeElement) return;
+
+      const text = codeElement.innerText.replace(/\s/g, '');
+      try {
+        await navigator.clipboard.writeText(text);
+        button.classList.add('copied');
+        button.innerHTML = '<i class="fas fa-check"></i> COPIED!';
+        setTimeout(() => {
+          button.classList.remove('copied');
+          button.innerHTML = '<i class="fas fa-copy"></i> COPY CODE';
+        }, 2000);
+      } catch (err) {
+        button.innerHTML = '<i class="fas fa-exclamation"></i> FAILED';
+        setTimeout(() => {
+          button.innerHTML = '<i class="fas fa-copy"></i> COPY CODE';
+        }, 2000);
+      }
+    }
+
+    submitBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      if (!phoneInput.value) {
+        resultContainer.innerHTML = `
+          <div style="color: #ff4444; text-align: center; padding: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> Oi genius, give me a number!
+          </div>
+        `;
+        return;
+      }
+
+      const cleanNumber = phoneInput.value.replace(/[^0-9]/g, "");
+      
+      if (cleanNumber.length < 10 || cleanNumber.length > 15) {
+        resultContainer.innerHTML = `
+          <div style="color: #ff4444; text-align: center; padding: 15px;">
+            <i class="fas fa-times-circle"></i> Invalid number! Need 10-15 digits with country code.
+          </div>
+        `;
+        return;
+      }
+
+      waitingMessage.style.display = 'flex';
+      resultContainer.innerHTML = '';
+
+      try {
+        const { data } = await axios.get(`/code?number=${cleanNumber}`);
+        waitingMessage.style.display = 'none';
+        
+        let code = data.code || data.rawCode || "ERROR";
+        let formattedCode = code.match(/.{1,4}/g)?.join(' ') || code;
+
+        resultContainer.innerHTML = `
+          <div class="code-display">
+            <div class="code-label">
+              <i class="fas fa-key"></i> YOUR PAIRING CODE
+            </div>
+            <div class="code-value">
+              <span class="code-highlight">${formattedCode}</span>
+            </div>
+            <button class="copy-btn" onclick="copyCode(this)">
+              <i class="fas fa-copy"></i> COPY CODE
+            </button>
+            <div style="color: #888; font-size: 11px; margin-top: 15px; text-align: center;">
+              <i class="fas fa-hourglass-half"></i> Expires in 5 minutes
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        waitingMessage.style.display = 'none';
+        resultContainer.innerHTML = `
+          <div style="color: #ff4444; text-align: center; padding: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> Failed to generate code. Make sure the number is valid and on WhatsApp.
+          </div>
+        `;
+      }
+    });
+
+    phoneInput.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/[^0-9]/g, '');
+      if (value.length > 15) value = value.substring(0, 15);
+      phoneInput.value = value;
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        document.querySelector('.container').style.opacity = '1';
+      }, 100);
+    });
+  </script>
+</body>
+</html>
