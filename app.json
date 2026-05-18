@@ -1,0 +1,40 @@
+{
+  "name": "FEE-XTREME-MULT-DEVICE",
+  "description": "⚡ A lightning-fast WhatsApp bot with multi-device support, built on Node.js & Baileys.",
+  "website": "https://github.com/Fred1e/Fee-xmd#readme",
+  "repository": "https://github.com/Fred1e/Fee-xmd.git",
+  "logo": "https://qu.ax/XxQwp.jpg",
+  "success_url": "/",
+  "keywords": [
+    "whatsapp-bot",
+    "baileys",
+    "nodejs",
+    "heroku",
+    "fee-xmd"
+  ],
+  "scripts": {
+    "postdeploy": "echo '🚀 Fee-Xmd has been successfully deployed!'"
+  },
+  "build": {
+    "languages": [
+      "nodejs"
+    ]
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql",
+      "as": "DATABASE"
+    }
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/clhuang/heroku-buildpack-webp-binaries.git"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-activestorage-preview"
+    }
+  ]
+}
